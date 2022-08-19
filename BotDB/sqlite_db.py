@@ -1,4 +1,3 @@
-from distutils.util import execute
 import sqlite3 as db
 
 
@@ -9,19 +8,25 @@ def sql_start():
     if conn:
         print('DB is OK!')
     conn.execute('CREATE TABLE IF NOT EXISTS general('
-                 'max_calories TEXT PRIMARY KEY, '
+                 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+                 'max_calories TEXT, '
                  'max_fats TEXT)')
     conn.commit()
 
 
 async def sql_add_command(state):
     async with state.proxy() as data:
-        cur.execute('INSERT INTO general VALUES (?, ?)', tuple(data.values()))
+        cur.execute('INSERT INTO general(max_calories, max_fats) '
+                    'VALUES (?, ?)', tuple(data.values()))
         conn.commit()
+
+
+async def change_limit_cal():
+    cur.execute('UPDATE general SET max_calories WHERE id = 1')
 
 
 async def dict_factory():
     conn.row_factory = db.Row
-    cur.execute('select * from general')
+    cur.execute('SELECT max_calories FROM general WHERE id = 1')
     data = cur.fetchone()
     return data
