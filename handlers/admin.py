@@ -36,7 +36,7 @@ async def get_calories(message: types.Message, state: FSMContext):
             await message.reply('Введи числа, пожалуйста')
 
 
-# Записываем жиры
+# Записываем жиры и формируем словарь из полученных данных
 async def get_fats(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         try:
@@ -47,6 +47,8 @@ async def get_fats(message: types.Message, state: FSMContext):
                 await message.reply(str(data))
             await sqlite_db.sql_add_command(state)
             await state.finish()
+            data = await sqlite_db.dict_factory()
+            return data
         except (ValueError, TypeError):
             await message.reply('Ну числа же, ну')
 

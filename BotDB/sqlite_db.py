@@ -1,3 +1,4 @@
+from distutils.util import execute
 import sqlite3 as db
 
 
@@ -17,3 +18,10 @@ async def sql_add_command(state):
     async with state.proxy() as data:
         cur.execute('INSERT INTO general VALUES (?, ?)', tuple(data.values()))
         conn.commit()
+
+
+async def dict_factory():
+    conn.row_factory = db.Row
+    cur.execute('select * from general')
+    data = cur.fetchone()
+    return data
