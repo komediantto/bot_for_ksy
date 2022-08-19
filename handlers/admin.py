@@ -2,6 +2,8 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
+from BotDB import sqlite_db
+
 
 # Создаём состояние для хранения лимита калорий
 class Preference(StatesGroup):
@@ -22,15 +24,14 @@ async def preference(message: types.Message):
     await Preference.max_calories.set()
 
 
-async def get_calories(message: types.Message,
-                       state=Preference.max_calories):
+async def get_calories(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         try:
+            await Preference.next()
             calories = int(message.text)
             data['max_calories'] = calories
             await message.reply(f'Понял. Твой лимит { message.text }.'
-                                'Теперь введи жиры.')
-            await Preference.next()
+                                ' Теперь введи жиры.')
         except (ValueError, TypeError):
             await message.reply('Введи числа, пожалуйста')
 
@@ -40,9 +41,12 @@ async def get_fats(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         try:
             fats = int(message.text)
-            data['max_fats'] = fats
+            await state.update_data(max_fats=fats)
             await message.reply(f'Надо скушать { message.text } жиров. Понял')
-            await message.reply(str(data))
+            async with state.proxy() as data:
+                await message.reply(str(data))
+            await sqlite_db.sql_add_command(state)
+            await state.finish()
         except (ValueError, TypeError):
             await message.reply('Ну числа же, ну')
 
