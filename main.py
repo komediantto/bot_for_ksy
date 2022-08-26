@@ -14,4 +14,5 @@ other.register_handlers_other(dp)
 
 if __name__ == "__main__":
     # Запуск бота
+    admin.scheduler.start()
     executor.start_polling(dp, skip_updates=True, on_startup=start)

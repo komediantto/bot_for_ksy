@@ -14,6 +14,7 @@ if not bot_token:
 
 storage = MemoryStorage()
 
+
 # Создаём бот и его обработчик
 bot = Bot(token=bot_token)
 dp = Dispatcher(bot, storage=storage)
