@@ -8,8 +8,9 @@ from .stickers import send_random_stickers
 
 
 class Measure:
-    def __init__(self, value):
+    def __init__(self, value, name):
         self.value = value
+        self.name = name
 
     async def send_remains(self, message: types.Message, column, eaten, id):
         mes_remains = self.value - eaten
@@ -18,7 +19,7 @@ class Measure:
                               f'WHERE id = {id}')
         sqlite_db.conn.commit()
         if mes_remains >= 0:
-            await message.reply(f'Твой остаток - {mes_remains} ккал ')
+            await message.reply(f'Твой остаток - {mes_remains} {self.name} ')
         else:
             send_random_stickers(message)
 
@@ -35,11 +36,11 @@ async def exp_cal(message: types.Message):
     eaten = int(dig_in_mes.group())
     id = message.from_user.id
     if 'калор' in message.text.lower():
-        calories = Measure(cal_val)
+        calories = Measure(cal_val, 'ккал')
         await calories.send_remains(message, 'max_calories',
                                     eaten=eaten, id=id)
     elif 'жир' in message.text.lower():
-        fats = Measure(fat_val)
+        fats = Measure(fat_val, 'жиров')
         await fats.send_remains(message, 'max_fats', eaten=eaten, id=id)
     else:
         pass

@@ -4,7 +4,7 @@ import sqlite3 as db
 # Создание двух таблиц для записи лимитов, вызывается при старте бота
 def sql_start():
     global conn, cur
-    conn = db.connect('calories.db')
+    conn = db.connect('calories.sqlite3')
     cur = conn.cursor()
     if conn:
         print('DB is OK!')
